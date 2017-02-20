@@ -1,0 +1,30 @@
+# test Event Stores
+
+Photon is the production ready event store from the Muon project. It is scalable, federated etc. All the good things.
+
+It is not, however, easy to embed in every language. If you are on the JVM, it can be done, but outside of that, it's hard.
+
+This project provides purely in memory, embedded implementations of the streaming features of Photon to give a good experience of using an event store during testing.
+
+They do not currently provide implementations of the projection features.
+
+
+## Using
+
+### JVM
+
+Add a dependency on the test event store library
+
+.Maven
+----
+<dependency>
+
+</dependency>
+----
+
+.Gradle
+----
+
+----
+
+###
