@@ -63,7 +63,7 @@ class TestEventStore {
             if (streamType == "cold") {
                 log.info "Requested a cold replay"
                 return Streams.from(history.findAll {
-                    it.streamName ==~ stream
+                    matches(it.streamName, stream)
                 })
             }
 
@@ -125,6 +125,11 @@ class TestEventStore {
                 event.failed(ex.getMessage());
             }
         }, muon.getCodecs(), muon.getDiscovery()));
+    }
+
+    def matches(name, pattern) {
+        pattern = pattern.replaceAll("\\*\\*", ".\\*")
+        name ==~ pattern
     }
 }
 

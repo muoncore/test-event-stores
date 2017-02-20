@@ -38,7 +38,7 @@ class TestEventStoreSpec extends Specification {
 
         and: "replay"
 
-        client.replay("/aggregate/team/.*", EventReplayMode.REPLAY_ONLY, new Subscriber<Event>() {
+        client.replay("/aggregate/team/**", EventReplayMode.REPLAY_ONLY, new Subscriber<Event>() {
             @Override
             void onSubscribe(Subscription s) {
                 s.request(Integer.MAX_VALUE)
