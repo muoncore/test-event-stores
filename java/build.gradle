@@ -37,6 +37,8 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.4'
 }
 
+group = "io.muoncore"
+project.version = currentVersion.toString()
 
 publishing {
     publications {
