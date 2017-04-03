@@ -122,7 +122,7 @@ class TestEventStore {
                     Event ev = event.event
                     ev.@orderId = orderId
                     ev.@eventTime = System.currentTimeMillis()
-                    history.add(event.getEvent());
+                    history.add(ev);
                     event.persisted(ev.orderId, ev.eventTime);
                 }
             } catch (Exception ex) {
