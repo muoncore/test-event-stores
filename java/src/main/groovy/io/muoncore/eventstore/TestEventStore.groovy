@@ -118,9 +118,13 @@ class TestEventStore {
                     subs.stream().forEach({ q ->
                         q.accept(event)
                     });
+                    def orderId = orderid.addAndGet(1)
+                    Event ev = event.event
+                    ev.@orderId = orderId
+                    ev.@eventTime = System.currentTimeMillis()
                     history.add(event.getEvent());
+                    event.persisted(ev.orderId, ev.eventTime);
                 }
-                event.persisted(orderid.addAndGet(1), System.currentTimeMillis());
             } catch (Exception ex) {
                 event.failed(ex.getMessage());
             }
