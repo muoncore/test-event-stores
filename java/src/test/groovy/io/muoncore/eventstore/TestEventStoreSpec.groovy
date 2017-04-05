@@ -63,7 +63,8 @@ class TestEventStoreSpec extends Specification {
         then:
         new PollingConditions().eventually {
             done &&
-                    data.size() == 10
+                    data.size() == 10 &&
+              (data.eventTime as HashSet).size() == 10
         }
     }
 

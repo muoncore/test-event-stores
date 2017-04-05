@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 class TestEventStore {
 
-    static Logger log = LoggerFactory.getLogger(TestEventStore)
+    public static Logger log = LoggerFactory.getLogger(TestEventStore)
 
     List<Event> history = new ArrayList<>();
     List<Broadcaster> subs = new ArrayList<>();
@@ -82,8 +82,9 @@ class TestEventStore {
                 void subscribe(Subscriber s) {
                     AtomicLong itemstoprocess = new AtomicLong(0)
 
-                    Thread.start {
-                        while (true) {
+                    boolean running = true
+                    Thread t = Thread.start {
+                        while (running) {
                             if (itemstoprocess.get() > 0) {
                                 def next = q.take()
                                 s.onNext(next)
@@ -103,7 +104,7 @@ class TestEventStore {
 
                         @Override
                         void cancel() {
-
+                          running = false
                         }
                     })
                 }
@@ -115,15 +116,16 @@ class TestEventStore {
             log.debug "Event received " + event.event
             try {
                 synchronized (history) {
-                    subs.stream().forEach({ q ->
-                        q.accept(event)
-                    });
                     def orderId = orderid.addAndGet(1)
                     Event ev = event.event
-                    ev.@orderId = orderId
-                    ev.@eventTime = System.currentTimeMillis()
+                    ev.orderId = orderId
+                    ev.eventTime = System.currentTimeMillis()
+                    log.info("persisted $ev")
                     history.add(ev);
                     event.persisted(ev.orderId, ev.eventTime);
+                    subs.stream().forEach({ q ->
+                      q.accept(event)
+                    });
                 }
             } catch (Exception ex) {
                 event.failed(ex.getMessage());
