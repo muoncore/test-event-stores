@@ -18,12 +18,13 @@ version = '1.0'
 repositories {
     jcenter()
     maven { url 'https://simplicityitself.artifactoryonline.com/simplicityitself/muon' }
+    maven { url 'https://simplicityitself.artifactoryonline.com/simplicityitself/muon-snapshot' }
 }
 
 dependencies {
-    def muonVersion = "7.2.2"
+    def muonVersion = "7.3.0"
     compile "io.muoncore:muon-core:$muonVersion"
-    compile "io.muoncore:muon-event:$muonVersion"
+    compile "io.muoncore.protocol:stack-event:0.0.1-SNAPSHOT"
 
     compile 'org.slf4j:slf4j-simple:1.7.21'
     compile "org.codehaus.groovy:groovy:2.4.7"
