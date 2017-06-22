@@ -71,12 +71,7 @@ class TestEventStore {
 
             if (request.args["stream-type"] && streamType == "hot-cold") {
                 log.debug "Has requested hot-cold replay .. "
-                Thread.start {
-                    sleep(100)
-                    history.each {
-                        b.accept(it)
-                    }
-                }
+                    history.each { q.add(it) }
             }
 
             new Publisher() {
@@ -126,6 +121,7 @@ class TestEventStore {
                     history.add(ev);
                     event.persisted(ev.orderId, ev.eventTime);
                     subs.stream().forEach({ q ->
+                      println "EMITTING $ev"
                       q.accept(event)
                     });
                 }
