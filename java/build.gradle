@@ -17,6 +17,7 @@ version = '1.0'
 
 repositories {
     jcenter()
+  mavenLocal()
     maven { url 'https://simplicityitself.artifactoryonline.com/simplicityitself/muon' }
     maven { url 'https://simplicityitself.artifactoryonline.com/simplicityitself/muon-snapshot' }
 }
