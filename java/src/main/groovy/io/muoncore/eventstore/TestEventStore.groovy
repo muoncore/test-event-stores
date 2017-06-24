@@ -121,7 +121,6 @@ class TestEventStore {
                     history.add(ev);
                     event.persisted(ev.orderId, ev.eventTime);
                     subs.stream().forEach({ q ->
-                      println "EMITTING $ev"
                       q.accept(event)
                     });
                 }
