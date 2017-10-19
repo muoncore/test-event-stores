@@ -27,12 +27,14 @@ class TestEventStore {
 
   public static Logger log = LoggerFactory.getLogger(TestEventStore)
 
-  List<Event> history = new ArrayList<>();
+  final List<Event> history = new ArrayList<>();
   List<Broadcaster> subs = new ArrayList<>();
   AtomicLong orderid = new AtomicLong(1)
 
   void clear() {
-    history.clear()
+    synchronized (history) {
+      history.clear()
+    }
   }
 
   TestEventStore(Muon muon) {
@@ -63,24 +65,29 @@ class TestEventStore {
       }
 
       if (streamType == "cold") {
-        def items = history.findAll {
-          matches(it.streamName, stream)
-        }
+        synchronized (history) {
+          def items = history.findAll {
+            matches(it.streamName, stream)
+          }
 
-        log.info "Requested a cold replay, found ${items.size()} items in the stream"
 
-        if (items) {
-          return Streams.from(items)
-        } else {
-          return Streams.empty()
+          log.info "Requested a cold replay, found ${items.size()} items in the stream"
+
+          if (items) {
+            return Streams.from(items)
+          } else {
+            return Streams.empty()
+          }
         }
       }
 
       if (request.args["stream-type"] && streamType == "hot-cold") {
-        log.debug "Has requested hot-cold replay .. "
-        history.findAll {
-          matches(it.streamName, stream)
-        }.each { q.add(it) }
+        synchronized (history) {
+          log.debug "Has requested hot-cold replay .. "
+          history.findAll {
+            matches(it.streamName, stream)
+          }.each { q.add(it) }
+        }
       }
 
       new Publisher() {
