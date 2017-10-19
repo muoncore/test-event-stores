@@ -78,7 +78,7 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
   from javadoc.destinationDir
 }
 
-packageJavadoc(type: Jar) {
+task packageJavadoc(type: Jar) {
   from javadoc
   classifier = 'javadoc'
 }
