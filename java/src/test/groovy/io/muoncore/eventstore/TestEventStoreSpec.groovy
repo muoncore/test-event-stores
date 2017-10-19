@@ -1,12 +1,12 @@
 package io.muoncore.eventstore
 
-import com.google.common.eventbus.EventBus
 import io.muoncore.MultiTransportMuon
 import io.muoncore.Muon
 import io.muoncore.codec.json.JsonOnlyCodecs
 import io.muoncore.config.AutoConfiguration
 import io.muoncore.memory.discovery.InMemDiscovery
 import io.muoncore.memory.transport.InMemTransport
+import io.muoncore.memory.transport.bus.EventBus
 import io.muoncore.protocol.event.ClientEvent
 import io.muoncore.protocol.event.Event
 import io.muoncore.protocol.event.client.DefaultEventClient
