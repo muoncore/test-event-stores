@@ -1,5 +1,8 @@
 # Change Log
 
+## [v0.0.16](https://github.com/muoncore/test-event-stores/tree/v0.0.16) (2018-03-12)
+[Full Changelog](https://github.com/muoncore/test-event-stores/compare/v0.0.15...v0.0.16)
+
 ## [v0.0.15](https://github.com/muoncore/test-event-stores/tree/v0.0.15) (2018-03-12)
 [Full Changelog](https://github.com/muoncore/test-event-stores/compare/v0.0.14...v0.0.15)
 
