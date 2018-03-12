@@ -28,6 +28,8 @@ dependencies {
     compile 'org.slf4j:slf4j-simple:1.7.21'
     compile "org.codehaus.groovy:groovy:2.4.7"
 
+    compile 'io.reactivex.rxjava2:rxjava:2.1.10'
+
     testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
     testCompile 'cglib:cglib:2.2.2'
     testCompile 'org.objenesis:objenesis:2.4'

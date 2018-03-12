@@ -1,5 +1,7 @@
 package io.muoncore.eventstore
 
+import groovy.transform.CompileDynamic
+import groovy.transform.CompileStatic
 import io.muoncore.Muon
 import io.muoncore.liblib.reactor.rx.Streams
 import io.muoncore.liblib.reactor.rx.broadcast.Broadcaster
@@ -23,12 +25,13 @@ import java.util.concurrent.atomic.AtomicLong
  A test event store, implementing the core interfaces of Photon.
  */
 
+@CompileStatic
 class TestEventStore {
 
   public static Logger log = LoggerFactory.getLogger(TestEventStore)
 
   final List<Event> history = new ArrayList<>();
-  List<Broadcaster> subs = new ArrayList<>();
+  List<Queue<Event>> subs = new ArrayList<>();
   AtomicLong orderid = new AtomicLong(1)
 
   void clear() {
@@ -47,29 +50,16 @@ class TestEventStore {
       def streamType = request.args["stream-type"]
       if (!streamType) streamType = "hot-cold"
 
-      log.info "Subscribing to $stream"
+      log.info "Subscribing to $stream with type=${streamType}"
 
-      def b = Broadcaster.<Event> create()
-
-      BlockingQueue q = new LinkedBlockingQueue()
-
-      subs << b
-
-      b.map {
-        if (it instanceof EventWrapper) {
-          return it.event
-        }
-        it
-      }.filter { it.streamName == stream }.consume {
-        q.add(it)
-      }
+      BlockingQueue<Event> q = new LinkedBlockingQueue()
+      subs << q
 
       if (streamType == "cold") {
         synchronized (history) {
           def items = history.findAll {
             matches(it.streamName, stream)
           }
-
 
           log.info "Requested a cold replay, found ${items.size()} items in the stream"
 
@@ -100,8 +90,12 @@ class TestEventStore {
             while (running) {
               if (itemstoprocess.get() > 0) {
                 def next = q.take()
-                s.onNext(next)
-                itemstoprocess.decrementAndGet()
+
+                if (next.streamName == stream) {
+                  log.debug("Have received data from queue, dispatching down ${stream}")
+                  s.onNext(next)
+                  itemstoprocess.decrementAndGet()
+                }
               }
               if (itemstoprocess.get() <= 0) {
                 sleep(100)
@@ -122,31 +116,40 @@ class TestEventStore {
           })
         }
       }
-
     }
 
-    muon.protocolStacks.registerServerProtocol(new EventServerProtocolStack({ event ->
+    muon.protocolStacks.registerServerProtocol(new EventServerProtocolStack({ EventWrapper event ->
       log.debug "Event received " + event.event
       try {
+        Event ev = event.event
         synchronized (history) {
           def orderId = orderid.addAndGet(1)
-          Event ev = event.event
-          ev.orderId = orderId
-          ev.eventTime = System.currentTimeMillis()
-          log.info("persisted $ev")
+          updateEvent(orderId, ev)
+          log.info("persisted $ev, will dispatch to ${subs.size()} subscribers")
           history.add(ev);
-          event.persisted(ev.orderId, ev.eventTime);
-          subs.stream().forEach({ q ->
-            q.accept(event)
-          });
         }
+        dispatchEvent(event);
+        event.persisted(ev.orderId, ev.eventTime);
       } catch (Exception ex) {
         event.failed(ex.getMessage());
       }
     }, muon.getCodecs(), muon.getDiscovery()));
   }
 
-  def matches(name, pattern) {
+  @CompileDynamic
+  private void dispatchEvent(EventWrapper event) {
+    subs.stream().forEach({ Queue<Event> q ->
+      q.add(event.event)
+    })
+  }
+
+  @CompileDynamic
+  private void updateEvent(long orderId, Event ev) {
+    ev.orderId = orderId
+    ev.eventTime = System.currentTimeMillis()
+  }
+
+  def matches(name, String pattern) {
     pattern = pattern.replaceAll("\\*\\*", ".\\*")
     name ==~ pattern
   }
