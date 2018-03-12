@@ -17,7 +17,7 @@ version = '1.0'
 
 repositories {
     jcenter()
-    maven { url 'http://artifactory.cloud.daviddawson.me/artifactory/muon' }
+    maven { url 'https://artifactory.cloud.daviddawson.me/artifactory/muon' }
 }
 
 dependencies {
@@ -110,7 +110,7 @@ artifacts {
 
 
 artifactory {
-    contextUrl = 'http://artifactory.cloud.daviddawson.me/artifactory/'   //The base Artifactory URL if not overridden by the publisher/resolver
+    contextUrl = 'https://artifactory.cloud.daviddawson.me/artifactory/'   //The base Artifactory URL if not overridden by the publisher/resolver
     publish {
         repository {
             repoKey = 'muon'   //The Artifactory repository key to publish to
